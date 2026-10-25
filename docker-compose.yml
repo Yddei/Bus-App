@@ -1,0 +1,19 @@
+
+services:
+  db:
+    image: mysql:8.0
+
+    container_name: BusApp-MySQL
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: busapp
+
+    ports:
+      - "3307:3306"
+    
+    volumes:
+      - busapp_data:/var/lib/mysql
+
+volumes:
+  busapp_data:
