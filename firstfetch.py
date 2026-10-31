@@ -1,5 +1,5 @@
 #this is for initial fetch of api
-#im testing waters
+#run this to fetch bus routes into local database first
 
 
 import os
@@ -26,36 +26,33 @@ def conn_db():
 
 
 def get_bus_routes():
-    all_routes = []     #list of all routes
-    skip = 0        #because pagination exist for the public api
+    routes = []
+    skip = 0
 
     while True:
-        try:
-            response = requests.get(
-                "https://datamall2.mytransport.sg/ltaodataservice/BusRoutes",
-                headers={
-                    "AccountKey": API_KEY,
-                    "accept": "applications/json"
-                },
-                params = {"$skip": skip},
-                timeout=15
-            )
+        response = requests.get(
+            "https://datamall2.mytransport.sg/ltaodataservice/BusRoutes",
+            headers={
+                "AccountKey": API_KEY,
+                "accept": "application/json"
+            },
+            params={"$skip": skip},
+            timeout=30
+        )
 
-            response.raise_for_status()
-            routes = response.json()["value"]
+        response.raise_for_status()
 
+        batch = response.json()["value"]
+        routes.extend(batch)
 
-        except requests.exceptions.RequestException as e:
-            print(f"request failed at skip={skip}: {e}")
-            raise
+        print(f"Fetched {len(batch)} records, total: {len(routes)}")
 
-        all_routes.extend(routes)
-
-        if len(routes) < 500:
+        if len(batch) < 500:
             break
+
         skip += 500
 
-        return all_routes
+    return routes
 
 
 #temp, delete later
@@ -92,8 +89,8 @@ def insert_bus_routes(routes):
                     route["Distance"]
                 )
             )
-            print("committing")
-            conn.commit()
+        print(f"committing {len(routes)}")
+        conn.commit()
 
     except Exception as e:
         conn.rollback()
