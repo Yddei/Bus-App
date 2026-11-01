@@ -19,4 +19,5 @@ def get_buses_by_stop(bus_stop_id):
     
     finally:
         cursor.close()
+        conn.close()
 
