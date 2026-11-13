@@ -1,15 +1,19 @@
-#from services.bus_routes import get_buses_by_stop
-from services.bus_arrivals import get_bus_arrivals
+from services.travel_time import get_bus_travel_time
 
 
-start_stop_id = input("Enter bus stop ID: ")
-dest_stop_id = input("Enter destination ID")
-bus_number = input("Enter bus number: ")
+def main():
+    start_stop_id = input("Enter bus stop ID: ")
+    dest_stop_id = input("Enter destination ID: ")
+    bus_number = input("Enter bus number: ")
 
-start_stop = get_bus_arrivals(start_stop_id, bus_number)
-dest_stop = get_bus_arrivals(dest_stop_id, bus_number)
+    result = get_bus_travel_time(start_stop_id, dest_stop_id, bus_number)
+    if result is None:
+        print("No matching bus with a valid travel time was found at both stops.")
+        return
 
-main_bus = start_stop.NextBus()
-main_bus_location = [main_bus.Latitude(), main_bus.Longitude()]
+    print(f"Bus {result['service_no']} travel time: {result['travel_time_seconds'] / 60:.1f} minutes")
+    print(f"Arrival at start: {result['start_arrival']}")
+    print(f"Arrival at destination: {result['destination_arrival']}")
 
-#if main_bus_location == [dest_stop.NextBus().Latitude(), dest_stop.NextBus().Longitude()]:
+if __name__ == "__main__":
+    main()
